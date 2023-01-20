@@ -92,12 +92,12 @@ def get_response(ints,intents_json,text): # obtiene una respuesta aleatoria segu
             #if(len(tipo_marca)>1): # Esta parte Lista
               #buscar_bodega(datos)
               #print("Buscando en Bodega")
-              #x = f"Funciona{tipo_marca}"
-              #return x
+              #x = f"Funciona{tipo_marca}" # Posible funcion de busqueda
+              return x
             #if(tag in user_data ):
               #features_user.append(text)
             #if(tag == "recomendar_ahora"):
-              #p = f"Realizando busqueda en bodega de {features_user}"
+              #p = f"Realizando busqueda en bodega de {features_user}" #posible función de recomendación
               #return p
             break
     return result
