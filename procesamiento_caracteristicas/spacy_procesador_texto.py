@@ -224,3 +224,44 @@ def get_transmision(df):
     trnasmision = get_transmision_value(tipo)
     return transmision
 
+##################################### MAIN ############################################
+
+# 1 Transformar datos de entrada 
+
+def get_df_raw(raw_text):
+  df = pd.DataFrame(raw_text,columns=['text'], index=['año','potencia','rango_precio','consumo','combustible','plazas','transmisión'])
+  return df
+
+'''try_it = ['año del auto: 2019', '235 caballos de fuerza', '27900 dólares', '40 millas por galón', 'gasolina', '4 asientos', 'automática']
+df_1 = get_df_raw(try_it)
+df_1'''
+
+
+# 3 Asignación de 
+
+# 3 Asignación de 
+
+def ajustar_df(bodega_raw):
+    df_bodega = bodega_raw.copy()
+    df_bodega["tipo"].replace(["gasolina","diesel","electrico", "hibrido"],[0,1,2,3],inplace=True)
+    df_bodega["transmicion"].replace(["automatico","manual"],[0,1],inplace=True)
+    promedio =[]
+    for rango in df_bodega["rango_de_precio"]:
+      prom = stats.mean(rango)
+      promedio.append(prom)
+    df_bodega.drop(["rango_de_precio"],axis=1,inplace=True)
+    df_bodega.insert(3,"promedio_precio",promedio)
+    return df_bodega
+
+# 4 KNN Modelo FIT de recomendación
+
+def recomendar_busqueda_df(m:list,df):
+
+    #['año','potencia','rango_precio','consumo','combustible','plazas','transmisión']
+    datos_recomendar = df.iloc[:,[1,2,3,4,5,6,7]].values
+    nn = NearestNeighbors(n_neighbors=1).fit(x)
+    y = nn.kneighbors([m])
+    auto = y[1][0][0]
+    recomend = pd.DataFrame(df.iloc[auto])
+    return recomend
+
