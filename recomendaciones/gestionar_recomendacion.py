@@ -15,9 +15,12 @@ import sys
 # ------------------------------
 
 sys.path.append(r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\procesamiento_caracteristicas')
+sys.path.append(r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\modelo_reconocimiento_imagenes')
+
 path = r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\gestion_bodega\bodega_autos.json'
 
 import spacy_procesador_texto as spt
+import predictor_de_tipo as pdt
 
 ###################################################################################
 ####################### FUNCIONES GENERALES ####################################
@@ -52,7 +55,7 @@ def df_to_image(df,tipo):
     fig_border = 'steelblue'
     data = df
     
-    archivo = f'./consultas/Consulta_{tipo}_{fecha}.png'              #Almacenamiento
+    archivo = f'C:/Users/HP-LAPTOP/Documents/GitHub/chat_bot/recomendaciones/consultas/Consulta_{tipo}_{fecha}.png'              #Almacenamiento
     
     column_headers = data.columns               # Nombre de las columnas de la tabla
     row_headers = [x for x in data.index]       # Nombre de las filas de la tabla
@@ -145,7 +148,7 @@ df_bodega = json_to_multidf(bodega_json)
 ########################################################################################
 ####################### FUNCIÓN DE BUSQUEDA DIRECTA ####################################
 
-def busqueda_directa(texto:list, df_bodega):
+def busqueda_directa(texto:list):
     auto = buscar_bodega(texto,df_bodega)
     datos = preparar_respuesta_busqueda(auto)
     resultado = df_to_image(datos,"direct")
@@ -153,20 +156,50 @@ def busqueda_directa(texto:list, df_bodega):
     return resultado
     
     
-########################################################################################
+################################################################################################
 ####################### FUNCIÓN DE BUSQUEDA CARACTERÍSTICAS ####################################
 
-def busqueda_caracteristicas(entrada, df_bodega):
+def busqueda_caracteristicas(entrada):
     auto = spt.recomendacion_caracteristicas(entrada, df_bodega)
     resultado = df_to_image(auto,"recomend")
+    print(f'Salida: {resultado}')
+    return resultado
+
+################################################################################################
+####################### FUNCIÓN DE BUSQUEDA URL ####################################
+''' FUNCIÓN BETA '''
+
+def referencia_url(entrada:int,df):
+  tipo = entrada
+  nt=[]
+  if tipo == 4:
+    nt.append("sedán")
+  elif tipo == 3:
+    nt.append('pickup')
+  elif tipo == 2 :
+    nt.append('deportivo')
+  elif tipo == 0:
+    nt.append('camioneta')
+  elif tipo == 1:
+    nt.append('coupé')
+  print(nt)
+  df.columns = ["Modelo","Año","Potencia(HP)","Rango de Precios","Consumo de combustible","Tipo de combustible","N° Asientos","Transmision"]
+  df_resultado = pd.DataFrame(df.loc[nt[0]])
+  return df_resultado
+
+def busqueda_url(url):
+    entrada = pdt.hacer_prediccion(url)
+    auto = referencia_url(entrada,df_bodega)
+    resultado = df_to_image(auto,"url")
     print(f'Salida: {resultado}')
     return resultado
     
 # PRUEBAS
 
-usuario = ['sedán', 'nissan']
+'''usuario = ['sedán', 'nissan']
 busqueda_directa(usuario, df_bodega)
 
 try_it = ['año del auto: 2019', '235 caballos de fuerza', '27900 dólares', '40 millas por galón', 'gasolina', '4 asientos', 'automática']
-busqueda_caracteristicas(try_it,df_bodega)
+busqueda_caracteristicas(try_it,df_bodega)'''
 
+#busqueda_url("https://www.nissan-cdn.net/content/dam/Nissan/mexico/vehicles/NP300/my21/vlp/np300-2021_blanca-exterior-piloto.jpg.ximg.l_full_h.smart.jpg")

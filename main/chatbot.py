@@ -3,6 +3,10 @@ import numpy as np
 import random
 from nltk.stem import SnowballStemmer
 from tensorflow.keras.models import load_model
+import sys
+
+sys.path.append(r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\recomendaciones')
+import gestionar_recomendacion as gest
 
 tipo_marca = []
 features_user = []
@@ -92,14 +96,17 @@ def get_response(ints,intents_json,text): # obtiene una respuesta aleatoria segu
             if(len(tipo_marca)>1): # Esta parte Lista
               #buscar_bodega(datos)
               print("Buscando en Bodega")
-              result = '01_20__12_03consulta.png'
+              result = gest.busqueda_directa(tipo_marca)
               tipo_marca = []
             if(tag in user_data ):
               features_user.append(text)
             if(tag == "recomendar_ahora"):
-              p = f"Realizando busqueda en bodega de {features_user}"
-              result = p
-              features_user=[]
+              print(f"Realizando busqueda en bodega de {features_user}")
+              result = gest.busqueda_caracteristicas(features_user)
+              features_user = []
+            if(tag == "url"):
+              print(f"Realizando prediccion de url {text}")
+              result = gest.busqueda_caracteristicas(text)
             else:
                 break
     return result

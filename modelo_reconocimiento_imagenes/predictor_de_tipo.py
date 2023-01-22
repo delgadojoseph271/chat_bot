@@ -10,7 +10,7 @@ import cv2
 # ===================== FUNCIÓN ==========================
 def cargar_modelo(ruta):
     # Recrea exactamente el mismo modelo solo desde el archivo
-    modelo = load_model('./modelo_carros.h5',custom_objects={'KerasLayer': hub.KerasLayer})
+    modelo = load_model(r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\modelo_reconocimiento_imagenes\modelo_carros.h5',custom_objects={'KerasLayer': hub.KerasLayer})
     return modelo
 
 def categorizar(url,ruta):
@@ -24,7 +24,7 @@ def categorizar(url,ruta):
     return np.argmax(prediccion[0], axis=-1)
 
 def hacer_prediccion(url):
-  prediccion = categorizar(url,'./modelo_carros.h5')
+  prediccion = categorizar(url,r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\modelo_reconocimiento_imagenes\modelo_carros.h5')
   print(prediccion)
   return prediccion
 
