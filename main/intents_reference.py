@@ -22,7 +22,7 @@ def start_intents():
                                 "saludos",
                                 "que tal"                      
                                 ],
-                    "responses":["Hola soy AUTO-BOT , tu asesor de compras para tu futuro automóvil.\n ¿En qué puedo ayudarte? "
+                    "responses":["Hola soy Rix-BOT , tu asesor de compras para tu futuro automóvil.\n ¿En qué puedo ayudarte? "
                                 ],
                     "context":[""]
                     },

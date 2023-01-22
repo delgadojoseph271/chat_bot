@@ -6,7 +6,11 @@
 import spacy
 from spacy.matcher import Matcher
 import es_core_news_sm
-  
+import statistics as stats
+import sklearn
+from sklearn.neighbors import NearestNeighbors
+import pandas as pd
+
 '''--------------------- PROCESAMIENTO DE DATOS ---------------------'''
 
 # Pendiente de implementar clases
@@ -164,8 +168,8 @@ def get_asientos(df):
 # 7 PROCESAR TRANSMISIÓN
 
 def get_transmision_value(tipo):
-  casos = ["manual","automatica"]
-  value = [0,1]
+  casos = ["manual","automática","automatica"]
+  value = [0,1,1]
   
   # Transmisión value
   # manual
@@ -173,6 +177,8 @@ def get_transmision_value(tipo):
     return value[0]
   # automática
   elif tipo in casos[1]:
+    return value[1]
+  elif tipo in casos[2]:
     return value[1]
 
 def get_transmision(df):
@@ -193,10 +199,10 @@ def get_transmision(df):
     matched_span = doc[start:end]
    
     tipo = matched_span.text
-    trnasmision = get_transmision_value(tipo)
+    transmision = get_transmision_value(tipo)
     return int(transmision)
 
-##################################### MAIN ############################################
+##################################### METODOS PRINCIPALES ############################################
 
 # 1 Transformar datos de entrada 
 
@@ -204,44 +210,67 @@ def get_df_raw(raw_text):
   df = pd.DataFrame(raw_text,columns=['text'], index=['año','potencia','rango_precio','consumo','combustible','plazas','transmisión'])
   return df
 
-'''try_it = ['año del auto: 2019', '235 caballos de fuerza', '27900 dólares', '40 millas por galón', 'gasolina', '4 asientos', 'automática']
-df_1 = get_df_raw(try_it)
-df_1'''
-
-
 # 2 Obtención de data ajustada
 
 def get_data_user(df):
 
     lista_features = [get_year(df),get_potencia(df),get_precio_promedio(df),
-                      get_consumo(df),get_tipo_combustible(df),get_asientos(df),
+                      get_consumo(df),get_combustible(df),get_asientos(df),
                       get_transmision(df)]
-
+    print(f"Datos de recomendación: {lista_features}")
     return lista_features
 
-# 3 Asignación de 
+# 3 Asignación de datos de Bodega ajustados
 
 def ajustar_df(bodega_raw):
+    print(bodega_raw)
     df_bodega = bodega_raw.copy()
     df_bodega["tipo"].replace(["gasolina","diesel","electrico", "hibrido"],[0,1,2,3],inplace=True)
-    df_bodega["transmicion"].replace(["automatico","manual"],[0,1],inplace=True)
+    df_bodega["transmision"].replace(["automatico","manual"],[0,1],inplace=True)
     promedio =[]
     for rango in df_bodega["rango_de_precio"]:
       prom = stats.mean(rango)
       promedio.append(prom)
     df_bodega.drop(["rango_de_precio"],axis=1,inplace=True)
     df_bodega.insert(3,"promedio_precio",promedio)
+
     return df_bodega
 
 # 4 KNN Modelo FIT de recomendación
 
 def recomendar_busqueda_df(m:list,df):
-
     #['año','potencia','rango_precio','consumo','combustible','plazas','transmisión']
     datos_recomendar = df.iloc[:,[1,2,3,4,5,6,7]].values
-    nn = NearestNeighbors(n_neighbors=1).fit(x)
+    print(datos_recomendar)
+    nn = NearestNeighbors(n_neighbors=1).fit(datos_recomendar)
     y = nn.kneighbors([m])
     auto = y[1][0][0]
     recomend = pd.DataFrame(df.iloc[auto])
     return recomend
+
+
+#####################################################################################################
+############################################# MAIN ##################################################
+
+
+def recomendacion_caracteristicas(entrada, bodega):
+   df_datos = get_df_raw(entrada)
+   ajuste_bodega = ajustar_df(bodega)
+   features = get_data_user(df_datos)
+
+   resultado = recomendar_busqueda_df(features, ajuste_bodega)
+   return resultado
+
+#----------------------------------------------------------------------------------------------------
+
+'''if __name__ == '__chatbot__':
+
+  recomendacion = recomendacion_caracteristicas(entrada, bodega):'''
+
+
+
+  
+
+
+
 

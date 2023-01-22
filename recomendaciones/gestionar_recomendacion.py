@@ -10,13 +10,17 @@ import pytz as tz                       # Librería TimeZones
 import json
 import os
 import matplotlib.pyplot as plt
-import statistics as stats
-import sklearn
-from sklearn.neighbors import NearestNeighbors
 import numpy as np
+import sys
+# ------------------------------
+
+sys.path.append(r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\procesamiento_caracteristicas')
+path = r'C:\Users\HP-LAPTOP\Documents\GitHub\chat_bot\gestion_bodega\bodega_autos.json'
+
+import spacy_procesador_texto as spt
 
 ###################################################################################
-####################### CARGAR DATOS DE BODEGA ####################################
+####################### FUNCIONES GENERALES ####################################
 
 # 0 Fecha y hora local
 def time_in_pty():
@@ -38,27 +42,9 @@ def json_to_multidf(dataframe):
     multi_df = pd.concat({k:pd.DataFrame(v).T for k, v in dataframe.items()},axis=0)
     return multi_df
 
-#############################################################################
-####################### BUSQUEDA DIRECTA ####################################
-
-# 1 Busqueda directa en bodega
-
-def buscar_bodega(datos,df):
-    car_serie = pd.DataFrame(df.loc[datos[0]].loc[datos[1]])
-    return car_serie
-
-# 2 Preparar respuesta de busqueda
-
-def preparar_respuesta_busqueda(df):
-    df.index = ['Modelo', 'Año', 'Potencia', 'Rango de precio (US Dolar)', 'Consumo de combustible',
-       'Tipo de Combustible', 'Plazas', 'Transmisión']
-    df.columns=[df.columns[0].title()]
-    df.replace()
-    return df
-
 # 3 Generar imagen de respuesta
 
-def df_to_image(df):
+def df_to_image(df,tipo):
 
     title_text = 'Consulta en Bodega'
     fecha = time_in_pty()
@@ -66,7 +52,7 @@ def df_to_image(df):
     fig_border = 'steelblue'
     data = df
     
-    archivo = fecha+"consulta.png"              #Almacenamiento
+    archivo = f'./consultas/Consulta_{tipo}_{fecha}.png'              #Almacenamiento
     
     column_headers = data.columns               # Nombre de las columnas de la tabla
     row_headers = [x for x in data.index]       # Nombre de las filas de la tabla
@@ -129,76 +115,58 @@ def df_to_image(df):
   
     return archivo
 
-########################################################################################
-####################### FUNCIÓN DE BUSQUEDA DIRECTA ####################################
+#############################################################################
+####################### BUSQUEDA DIRECTA ####################################
 
-def busqueda_directa(texto):
-    bodega_json = abrir_json('')
-    
-#######################################################################################
-#################################### RECOMENDACIÓN ####################################
+# 1 Busqueda directa en bodega
 
-# 1 Transformar datos de entrada 
+def buscar_bodega(datos,df):
+    car_serie = pd.DataFrame(df.loc[datos[0]].loc[datos[1]])
+    return car_serie
 
-def get_df_raw(raw_text):
-  df = pd.DataFrame(raw_text,columns=['text'], index=['año','potencia','rango_precio','consumo','combustible','plazas','transmisión'])
-  return df
+# 2 Preparar respuesta de busqueda
 
-try_it = ['año del auto: 2019', '235 caballos de fuerza', '27900 dólares', '40 millas por galón', 'gasolina', '4 asientos', 'automática']
-df_1 = get_df_raw(try_it)
-df_1
-
-# 2 Asignación de 
-
-def ajustar_df(bodega_raw):
-    df_bodega = bodega_raw.copy()
-    df_bodega["tipo"].replace(["gasolina","diesel","electrico", "hibrido"],[0,1,2,3],inplace=True)
-    df_bodega["transmicion"].replace(["automatico","manual"],[0,1],inplace=True)
-    promedio =[]
-    for rango in df_bodega["rango_de_precio"]:
-      prom = stats.mean(rango)
-      promedio.append(prom)
-    df_bodega.drop(["rango_de_precio"],axis=1,inplace=True)
-    df_bodega.insert(3,"promedio_precio",promedio)
-    return df_bodega
-# 3 KNN Modelo FIT de recomendación
-
-def recomendar_busqueda_df(m:list,df):
-
-    #['año','potencia','rango_precio','consumo','combustible','plazas','transmisión']
-    datos_recomendar = df.iloc[:,[1,2,3,4,5,6,7]].values
-    nn = NearestNeighbors(n_neighbors=1).fit(x)
-    y = nn.kneighbors([m])
-    auto = y[1][0][0]
-    recomend = pd.DataFrame(df.iloc[auto])
-    return recomend
-
-'''m = [2020,120,15500,30,1,3,0]  
-prt=recomendar_busqueda_df(m,df_bodega1)
-prt'''
-
+def preparar_respuesta_busqueda(df):
+    df.index = ['Modelo', 'Año', 'Potencia', 'Rango de precio (US Dolar)', 'Consumo de combustible',
+       'Tipo de Combustible', 'Plazas', 'Transmisión']
+    df.columns=[df.columns[0].title()]
+    df.replace()
+    return df
 
 
 ######################################################################
 # ========================== MAIN ====================================
 
-time_in_pty()
+bodega_json = abrir_json(path)
 
-bodega_json = abrir_json('bodega_autos.json')
-print(bodega_json)
-
-autos = json_to_multidf(bodega_json)
-print(autos)
-
-usuario = ['camioneta', 'toyota']
-
-auto = buscar_bodega(usuario,autos)
-print(auto)
+df_bodega = json_to_multidf(bodega_json)
 
 
-printable_df = preparar_respuesta_busqueda(auto)
-print(printable_df)
+########################################################################################
+####################### FUNCIÓN DE BUSQUEDA DIRECTA ####################################
 
+def busqueda_directa(texto:list, df_bodega):
+    auto = buscar_bodega(texto,df_bodega)
+    datos = preparar_respuesta_busqueda(auto)
+    resultado = df_to_image(datos,"direct")
+    print(f'Salida: {resultado}')
+    return resultado
+    
+    
+########################################################################################
+####################### FUNCIÓN DE BUSQUEDA CARACTERÍSTICAS ####################################
 
-p = df_to_image(auto)
-print(p)
+def busqueda_caracteristicas(entrada, df_bodega):
+    auto = spt.recomendacion_caracteristicas(entrada, df_bodega)
+    resultado = df_to_image(auto,"recomend")
+    print(f'Salida: {resultado}')
+    return resultado
+    
+# PRUEBAS
+
+usuario = ['sedán', 'nissan']
+busqueda_directa(usuario, df_bodega)
+
+try_it = ['año del auto: 2019', '235 caballos de fuerza', '27900 dólares', '40 millas por galón', 'gasolina', '4 asientos', 'automática']
+busqueda_caracteristicas(try_it,df_bodega)
+

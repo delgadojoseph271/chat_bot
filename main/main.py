@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 
 #----------------------
 import os
-import autoit
+import autoit #
 
 
 ##############################################################
@@ -151,15 +151,15 @@ def preparar_imagen(ruta):
     file = os.path.abspath(ruta)
     clip_box = driver.find_element(By.XPATH,'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/div')
     clip_box.click()
-    sleep(3)
+    sleep(1)
 
     image_box = driver.find_element(By.XPATH,'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/span/div/div/ul/li[1]')
     image_box.click()
-    sleep(3)
+    sleep(2)
     autoit.win_active("Abrir")
     autoit.control_send("Abrir","Edit1",file)
     autoit.control_send("Abrir","Edit1","{ENTER}")
-    sleep(5)
+    sleep(2)
     webdriver.ActionChains(driver).send_keys(Keys.ENTER).perform()
 
 
