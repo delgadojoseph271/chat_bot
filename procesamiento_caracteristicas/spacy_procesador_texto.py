@@ -9,14 +9,12 @@ import es_core_news_sm
   
 '''--------------------- PROCESAMIENTO DE DATOS ---------------------'''
 
+# Pendiente de implementar clases
+
 #1 PROCESAR AÑO
 
 def get_year(df):
   dato = df.loc["año"][0]
-  import spacy
-  from spacy.matcher import Matcher
-  import es_core_news_sm
-  
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
   print(doc)
@@ -32,16 +30,13 @@ def get_year(df):
     matched_span = doc[start:end]
    
     year = matched_span.text
-    return year
+    return int(year)
 
 #2 PROCESAR POTENCIA
 
 def get_potencia(df):
   dato = df.loc["potencia"][0]
-  import spacy
-  from spacy.matcher import Matcher
-  import es_core_news_sm
-  
+
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
   print(doc)
@@ -57,15 +52,12 @@ def get_potencia(df):
     matched_span = doc[start:end]
    
     potencia = matched_span.text
-    return potencia
+    return int(potencia)
 
 #3 PROCESAR PRECIO APROXIMADO
 
 def get_precio_promedio(df):
   dato = df.loc["rango_precio"][0]
-  import spacy
-  from spacy.matcher import Matcher
-  import es_core_news_sm
   
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
@@ -82,16 +74,13 @@ def get_precio_promedio(df):
     matched_span = doc[start:end]
    
     precio_promedio = matched_span.text
-    return precio_promedio
+    return float(precio_promedio)
 
 
 #4 PROCESAR CONSUMO
 
 def get_consumo(df):
   dato = df.loc["consumo"][0]
-  import spacy
-  from spacy.matcher import Matcher
-  import es_core_news_sm
   
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
@@ -108,7 +97,7 @@ def get_consumo(df):
     matched_span = doc[start:end]
    
     consumo = matched_span.text
-    return consumo
+    return int(consumo)
 
 #5 PROCESAR TIPO DE COMBUSTIBLE
  
@@ -130,6 +119,7 @@ def  combustible_value(tipo):
 
 def get_combustible(df):
   dato = df.loc["combustible"][0]
+
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
   print(doc)
@@ -146,33 +136,14 @@ def get_combustible(df):
    
     combustible = matched_span.text
     df_value = combustible_value(combustible)
-    return df_value
+    return int(df_value)
 
-#6 PROCESAR TIPO DE COMBUSTIBLE
 
-def get_consumo(df):
-  dato = df.loc["consumo"][0]
-  nlp = spacy.load('es_core_news_sm')
-  doc = nlp(dato)
-  print(doc)
-  pattern2 =  [{"LIKE_NUM": True}]
-
-  matcher = Matcher(nlp.vocab) 
-  matcher.add("dato", [pattern2])
-  matches = matcher(doc)
-  print(matches)
-
-  for match_id, start, end in matches:
-    # Obtén el span resultante
-    matched_span = doc[start:end]
-   
-    consumo = matched_span.text
-    return consumo
-
-# PROCESAR NÚMERO DE ASIENTOS
+# 6 PROCESAR NÚMERO DE ASIENTOS
 
 def get_asientos(df):
   dato = df.loc["plazas"][0] 
+
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
   print(doc)
@@ -188,9 +159,9 @@ def get_asientos(df):
     matched_span = doc[start:end]
    
     asientos = matched_span.text
-    return asientos
+    return int(asientos)
 
-# PROCESAR TRANSMISIÓN
+# 7 PROCESAR TRANSMISIÓN
 
 def get_transmision_value(tipo):
   casos = ["manual","automatica"]
@@ -206,6 +177,7 @@ def get_transmision_value(tipo):
 
 def get_transmision(df):
   dato = df.loc["transmisión"][0]
+
   nlp = spacy.load('es_core_news_sm')
   doc = nlp(dato)
   print(doc)
@@ -222,7 +194,7 @@ def get_transmision(df):
    
     tipo = matched_span.text
     trnasmision = get_transmision_value(tipo)
-    return transmision
+    return int(transmision)
 
 ##################################### MAIN ############################################
 
@@ -237,7 +209,15 @@ df_1 = get_df_raw(try_it)
 df_1'''
 
 
-# 3 Asignación de 
+# 2 Obtención de data ajustada
+
+def get_data_user(df):
+
+    lista_features = [get_year(df),get_potencia(df),get_precio_promedio(df),
+                      get_consumo(df),get_tipo_combustible(df),get_asientos(df),
+                      get_transmision(df)]
+
+    return lista_features
 
 # 3 Asignación de 
 
