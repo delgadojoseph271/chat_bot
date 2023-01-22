@@ -1,0 +1,2 @@
+Las rutas están asignadas según este directorio deben cambiarse al momento de ejecutarse por primera vez.
+Pendiente asignar el ejecutor MAIN de cada archivo.
