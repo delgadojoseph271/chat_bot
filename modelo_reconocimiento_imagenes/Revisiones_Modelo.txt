@@ -1,2 +1,2 @@
 Las rutas están asignadas según este directorio deben cambiarse al momento de ejecutarse por primera vez.
-Pendiente asignar el ejecutor MAIN de cada archivo.
+La carpeta con los elementos de referencia para el modelo están en la carpeta zip
