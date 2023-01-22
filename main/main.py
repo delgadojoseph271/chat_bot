@@ -11,7 +11,10 @@ from selenium.webdriver.common.keys import Keys
 import os
 import autoit
 
-''' ----------------- GESTIÓN DE SESIÓN EN LINEA ----------------- '''
+
+##############################################################
+# ----------------- GESTIÓN DE SESIÓN EN LINEA --------------
+
 
 ruta_archivo = "./whatsapp_session.txt" #Archivo de Sesión guardado en la misma carpeta que el resto del proyecto
 driver = webdriver
@@ -55,6 +58,7 @@ def normalizar(mensaje: str):
     # -> NFC
     return normalize( 'NFC', mensaje)
 
+
 # IMPORTANTE!!!!
 #Requiere de constante actualización/revisión en la sección CLASS_NAME
 
@@ -92,8 +96,8 @@ def verificar_mensajes_pendientes(chat):
         pendiente = False
     return pendiente
 
-
-''' ----------------- BUSQUEDA E INTERACCIÓN ----------------- '''
+##############################################################
+# ----------------- BUSQUEDA E INTERACCIÓN ----------------- #
 
 def buscar_chats():
     print("BUSCANDO CHATS")
@@ -196,7 +200,8 @@ def procesar_mensaje(mensaje :str):
         
     # Generar ESC para salir de la conversacion
 
-''' ----------------- INICIAR DE SESIÓN EN LINEA ----------------- '''
+##############################################################
+# ----------------- INICIAR DE SESIÓN EN LINEA ---------------
 
 def whatsapp_bot_init():
     global driver
@@ -220,8 +225,9 @@ def whatsapp_bot_init():
             continue
         else:
             procesar_mensaje(msj_recibido)
+            
 
-'''//////////////////////////////////////////////// MAIN ////////////////////////////////////////////////'''
+#//////////////////////////////////////////////// MAIN ////////////////////////////////////////////////
 # Controlador
 
 from sesion_activa import iniciar_mantener_sesion
